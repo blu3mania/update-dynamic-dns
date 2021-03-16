@@ -43,11 +43,7 @@ also be used to just monitor a network interface without auto DNS update.
    * showNotification allows showing Windows notification when an action is taken, such as domain is updated
      in provider, or domain update is queued (due to update interval).
 
-     **Note 1**, this only works when running in standalone mode instead of as a Windows service.
-
-     **Note 2**, since the notifier uses Snoretoast for Windows Toast notification, a new app "Snoretoast"
-     will be registered on Start menu if using this feature, and all notifications will appear to be from that
-     app.
+     **Note**, this only works when running in standalone mode instead of as a Windows service.
    * notificationTypes is an array of string values that defines what types of notification should be shown.
 
      Supported values are: "DNS Registration", "Scheduled DNS Registration", "IP Changed", "IP Assigned", "IP

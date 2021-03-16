@@ -45,11 +45,7 @@
             case NetworkInterfaceMonitor.EventType.IPChanged:
                 info(`${settings.addressFamily} address changed: ${address[settings.addressFamily]}`);
                 if (settings.showNotification && settings.notificationTypes.find(type => type.toLowerCase() === NotificationType.IpChanged)) {
-                    notifier.notify({
-                        title: 'IP Changed',
-                        message: `Network interface '${settings.networkInterface}' ${settings.addressFamily} address changed: ${address[settings.addressFamily]}`,
-                        icon: getImagePath('ip-changed.png'),
-                    });
+                    sendDesktopNotification('IP Changed', `Network interface '${settings.networkInterface}' ${settings.addressFamily} address changed: ${address[settings.addressFamily]}`, 'ip-changed.png');
                 }
                 break;
 
@@ -57,22 +53,14 @@
                 info(`Network interface '${settings.networkInterface}' is now active.`);
                 info(`${settings.addressFamily} address assigned: ${address[settings.addressFamily]}`);
                 if (settings.showNotification && settings.notificationTypes.find(type => type.toLowerCase() === NotificationType.IpAssigned)) {
-                    notifier.notify({
-                        title: 'IP Assigned',
-                        message: `Network interface '${settings.networkInterface}' ${settings.addressFamily} address assigned: ${address[settings.addressFamily]}`,
-                        icon: getImagePath('ip-changed.png'),
-                    });
+                    sendDesktopNotification('IP Assigned', `Network interface '${settings.networkInterface}' ${settings.addressFamily} address assigned: ${address[settings.addressFamily]}`, 'ip-changed.png');
                 }
                 break;
 
             case NetworkInterfaceMonitor.EventType.IPRemoved:
                 warning(`Network interface '${settings.networkInterface}' is now inactive!`);
                 if (settings.showNotification && settings.notificationTypes.find(type => type.toLowerCase() === NotificationType.IpRemoved)) {
-                    notifier.notify({
-                        title: 'IP Removed',
-                        message: `Network interface '${settings.networkInterface}' is now inactive!`,
-                        icon: getImagePath('ip-changed.png'),
-                    });
+                    sendDesktopNotification('IP Removed', `Network interface '${settings.networkInterface}' is now inactive!`, 'ip-changed.png');
                 }
                 break;
         }
@@ -92,11 +80,7 @@
                         currentRegisteredIP = data;
                         info(`Registered ${settings.addressFamily} address ${currentRegisteredIP}`);
                         if (settings.showNotification && settings.notificationTypes.find(type => type.toLowerCase() === NotificationType.DnsRegistration)) {
-                            notifier.notify({
-                                title: 'DNS Registration Updated',
-                                message: `Updated domain ${settings.domainName} with IP ${currentRegisteredIP}`,
-                                icon: getImagePath('dns-updated.png'),
-                            });
+                            sendDesktopNotification('DNS Registration Updated', `Updated domain ${settings.domainName} with IP ${currentRegisteredIP}`, 'dns-updated.png');
                         }
                         break;
 
@@ -104,11 +88,7 @@
                         const waitTime = Math.round(data / 1000);
                         warning(`Last IP registration just happened so next one is deferred. Waiting for ${waitTime < 1 ? 'less than 1' : waitTime} second${waitTime > 1 ? 's' : ''} before calling provider...`);
                         if (settings.showNotification && settings.notificationTypes.find(type => type.toLowerCase() === NotificationType.ScheduledDnsRegistration)) {
-                            notifier.notify({
-                                title: 'DNS Registration Scheduled',
-                                message: `Will update domain ${settings.domainName} with IP ${ipToRegister} in ${waitTime} seconds.`,
-                                icon: getImagePath('dns-update-scheduled.png'),
-                            });
+                            sendDesktopNotification('DNS Registration Scheduled', `Will update domain ${settings.domainName} with IP ${ipToRegister} in ${waitTime} seconds.`, 'dns-update-scheduled.png');
                         }
                         break;
 
@@ -116,11 +96,7 @@
                         ipToRegister = null;
                         error(`Registration failed due to error: ${data}`);
                         if (settings.showNotification && settings.notificationTypes.find(type => type.toLowerCase() === NotificationType.DnsRegistration)) {
-                            notifier.notify({
-                                title: 'DNS Registration Failure',
-                                message: `Failed to update domain ${settings.domainName}!`,
-                                icon: getImagePath('dns-update-failure.png'),
-                            });
+                            sendDesktopNotification('DNS Registration Failure', `Failed to update domain ${settings.domainName}!`, 'dns-update-failure.png');
                         }
                         break;
                 }
@@ -198,6 +174,15 @@
             error('Failed to start network interface monitor. Exiting...');
             process.exit(-1);
         }
+    }
+
+    function sendDesktopNotification(title, message, icon) {
+        notifier.notify({
+            title: title,
+            message: message,
+            appID: 'Update Dynamic DNS',
+            icon: getImagePath(icon),
+        });
     }
 
     function getImagePath(imageFile) {
